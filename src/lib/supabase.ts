@@ -1,40 +1,38 @@
+
 import { createClient } from '@supabase/supabase-js';
 
-// Dedicated public configuration module for TaskFlow in Google AI Studio
-const SUPABASE_PROJECT_URL = 'https://bbgunezhutmbtqhyviiz.supabase.co';
+const SUPABASE_PROJECT_URL =
+  'https://bbgunezhutmbtqhyviiz.supabase.co';
 
-// Publishable anon key retrieved from environment or client runtime storage
-const getSupabaseAnonKey = () => {
-  return localStorage.getItem('TASKFLOW_SUPABASE_KEY') || import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const SUPABASE_ANON_KEY =
+  import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+export const isSupabaseConfigured = () => {
+  return Boolean(SUPABASE_PROJECT_URL && SUPABASE_ANON_KEY);
 };
+
+if (!SUPABASE_ANON_KEY) {
+  console.error('TaskFlow: Supabase publishable key is missing.');
+}
 
 export const supabase = createClient(
   SUPABASE_PROJECT_URL,
-  getSupabaseAnonKey() || 'placeholder-anon-key'
+  SUPABASE_ANON_KEY || 'missing-key'
 );
 
-export const isSupabaseConfigured = () => {
-  return Boolean(SUPABASE_PROJECT_URL && getSupabaseAnonKey());
-};
-
-export const saveSupabasePublishableKey = (key: string) => {
-  localStorage.setItem('TASKFLOW_SUPABASE_KEY', key.trim());
-  window.location.reload();
-};
-
-export async function testSupabaseConnection(): Promise<{ success: boolean; message: string }> {
-  const anonKey = getSupabaseAnonKey();
-  if (!anonKey) {
+export async function testSupabaseConnection() {
+  if (!isSupabaseConfigured()) {
     return {
       success: false,
-      message: 'Supabase publishable key is missing. Please enter your Supabase publishable key to connect.',
+      message: 'Supabase publishable key is missing. Check .env.local.',
     };
   }
 
   try {
-    // Perform a real request to the tasks table as required
-    const { error } = await supabase.from('tasks').select('*', { count: 'exact', head: true });
-    
+    const { error } = await supabase
+      .from('tasks')
+      .select('id', { count: 'exact', head: true });
+
     if (error) {
       return {
         success: false,
@@ -44,12 +42,13 @@ export async function testSupabaseConnection(): Promise<{ success: boolean; mess
 
     return {
       success: true,
-      message: 'Successfully connected to Supabase PostgreSQL tasks table and verified RLS security!',
+      message: 'Successfully connected to Supabase!',
     };
-  } catch (err: any) {
+  } catch (err) {
     return {
       success: false,
-      message: `Network error connecting to Supabase: ${err.message || 'Unknown error'}`,
+      message: `Connection failed: ${err instanceof Error ? err.message : 'Unknown error'
+        }`,
     };
   }
 }

@@ -15,7 +15,7 @@ import { Projects } from './pages/Projects';
 import { Progress } from './pages/Progress';
 import { Login } from './pages/Login';
 import { taskService, Task, Project } from './services/taskService';
-import { isSupabaseConfigured, saveSupabasePublishableKey, testSupabaseConnection } from './lib/supabase';
+import { isSupabaseConfigured, testSupabaseConnection } from './lib/supabase';
 import { Database, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react';
 
 function SupabaseConnectionStatusBar() {
