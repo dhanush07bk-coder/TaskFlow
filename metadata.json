@@ -1,0 +1,6 @@
+{
+  "name": "TaskFlow",
+  "description": "Modern project and task management app with AI task breakdown, Kanban boards, list views, progress analytics, and team collaboration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
